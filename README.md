@@ -98,6 +98,11 @@ abp vNext 微信小程序登录模块
         }
 
 ```
+### 在HostModule,ABP启动模块中添加扩展支持
+```C# 
+  context.Services.AddIdentityServerBuilder ().AddExtensionGrantValidator<WeChatMiniProgramGrantValidator> ();
+```
+
 ### 如果上述使用后不成功尝试在：[IdentityServerClientGrantTypes] 表中添加WeChatMiniProgram_credentials支持
 数据种子类似这样
 ```C#
