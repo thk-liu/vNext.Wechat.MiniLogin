@@ -61,8 +61,8 @@ abp vNext 微信小程序登录模块
 ### 微信登录方式，兼容初次登录与后续登录
 ```C#
 [Produces ("application/json")]
-        [HttpGet ("WeChatMiniLogin")]
-        public async Task<IActionResult> WeChatMiniLogin (string code) {
+[HttpGet ("WeChatMiniLogin")]
+public async Task<IActionResult> WeChatMiniLogin (string code) {
 
             var needAdvanced = true;
             //调用第三方服务通过小程序内部登录后的Code获取微信Session信息
@@ -95,8 +95,35 @@ abp vNext 微信小程序登录模块
             var tokenReponse = await RequestTokenByOpenIdAsync (wechatSession.Openid);
 
             return Json (new { needAdvanced, wechatSession, tokenReponse.AccessToken });
-        }
+}
+      
+```
+```C#
+private async Task<TokenResponse> RequestTokenByOpenIdAsync (string openId) {
+            var config = new IdentityClientConfiguration ();
+            config.Authority = _configuration["AuthServer:Authority"];
+            config.ClientId = _configuration["AuthServer:ClientId"];
+            config.ClientSecret = _configuration["AuthServer:ClientSecret"];
+            config.GrantType = "WeChatMiniProgram_credentials"; //_configuration["AuthServer:ClientSecret"];
+            config.Add ("openid", openId);
+            config.Scope = "BackendAdminAppGateway AgentService ProductService IdentityService FileService OrderService LeaseService PriceService";
 
+            using (var client = new HttpClient ()) {
+                var response = await client.RequestTokenAsync (new TokenRequest {
+                    //Address = "https://demo.identityserver.io/connect/token",
+                    Address = config.Authority + "/connect/token",
+                        GrantType = config.GrantType, // "custom",
+
+                        ClientId = config.ClientId,
+                        ClientSecret = config.ClientSecret,
+
+                        Parameters = { { "openId", openId },
+                            { "scope", config.Scope }
+                        }
+                });
+                return response;
+            }
+        }
 ```
 ### 在HostModule,ABP启动模块中添加扩展支持
 ```C# 
