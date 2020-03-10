@@ -98,3 +98,15 @@ abp vNext 微信小程序登录模块
         }
 
 ```
+### 如果上述使用后不成功尝试在：[IdentityServerClientGrantTypes] 表中添加WeChatMiniProgram_credentials支持
+数据种子类似这样
+```C#
+await CreateClientAsync (
+                "backend-admin-app-client",
+                commonScopes.Union (new [] { "BackendAdminAppGateway", "IdentityService", "ProductService", "AgentService", "FileService", "OrderService", "CorpService", "LeaseService", "PriceService" }),
+                new [] { "hybrid", "password", "WeChatMiniProgram_credentials" },
+                commonSecret,
+                redirectUri: "http://localhost:51954/signin-oidc",
+                postLogoutRedirectUri: "http://localhost:51954/signout-callback-oidc"
+            );
+ ```
